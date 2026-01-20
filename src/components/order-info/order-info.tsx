@@ -2,6 +2,7 @@ import { FC, useMemo, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from '../../services/store';
 import { getOrderByNumber } from '../../services/slices/orders-slice';
+import { fetchIngredients } from '../../services/slices/ingredients-slice';
 import { Preloader } from '../ui/preloader';
 import { OrderInfoUI } from '../ui/order-info';
 import { TIngredient } from '@utils-types';
@@ -28,6 +29,13 @@ export const OrderInfo: FC = () => {
       dispatch(getOrderByNumber(Number(number)));
     }
   }, [dispatch, number, orderData]);
+
+  useEffect(() => {
+    // Если ингредиенты не загружены, загружаем их
+    if (!ingredients.length) {
+      dispatch(fetchIngredients());
+    }
+  }, [dispatch, ingredients.length]);
 
   /* Готовим данные для отображения */
   const orderInfo = useMemo(() => {

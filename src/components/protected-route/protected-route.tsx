@@ -19,9 +19,10 @@ export const ProtectedRoute: FC<ProtectedRouteProps> = ({
     return <Navigate to='/login' state={{ from: location }} replace />;
   }
 
-  // авторизован → нельзя в логин/регу
+  // авторизован → нельзя в логин/регу, перенаправляем на сохранённый маршрут или главную
   if (user && onlyUnAuth) {
-    return <Navigate to='/' replace />;
+    const from = location.state?.from?.pathname || '/';
+    return <Navigate to={from} replace />;
   }
 
   return children;
