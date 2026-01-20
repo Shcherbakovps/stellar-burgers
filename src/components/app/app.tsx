@@ -24,14 +24,16 @@ import { Preloader } from '@ui';
 
 import { useDispatch, useSelector } from '../../services/store';
 import { getUser } from '../../services/slices/auth-slice';
+import { fetchIngredients } from '../../services/slices/ingredients-slice';
 
 const App = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const location = useLocation();
-  // Если есть background, используем его для модалки, но основной Routes всегда на текущем location
+  // Если есть background, основной Routes показывает страницу из background (подложку для модалки)
   const state = location.state as { background?: typeof location } | null;
+  const background = state?.background;
 
   const isAuthChecked = useSelector((state) => state.auth.isAuthChecked);
   const hasInitialized = useRef(false);
@@ -40,6 +42,7 @@ const App = () => {
     if (!hasInitialized.current) {
       hasInitialized.current = true;
       dispatch(getUser());
+      dispatch(fetchIngredients());
     }
     // dispatch стабилен, но ESLint требует его в зависимостях
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -57,8 +60,8 @@ const App = () => {
         <>
           <AppHeader />
 
-          {/* Основной роутинг всегда на текущем location */}
-          <Routes>
+          {/* Основной роутинг: показывает background если есть, иначе текущий location */}
+          <Routes location={background || location}>
             <Route path='/' element={<ConstructorPage />} />
             <Route path='/feed' element={<Feed />} />
 
@@ -126,46 +129,37 @@ const App = () => {
             <Route path='*' element={<NotFound404 />} />
           </Routes>
 
-          {/* Модалки — только на "фоновом" экране, и исключаем страницы логина/регистрации */}
-          {state?.background &&
-            ![
-              '/login',
-              '/register',
-              '/forgot-password',
-              '/reset-password'
-            ].includes(state.background.pathname) && (
-              <Routes location={state.background}>
-                <Route
-                  path='/feed/:number'
-                  element={
+          {/* Модалки — рендерятся по текущему location поверх страницы из background */}
+          {background && (
+            <Routes>
+              <Route
+                path='/feed/:number'
+                element={
+                  <Modal title='' onClose={handleModalClose}>
+                    <OrderInfo />
+                  </Modal>
+                }
+              />
+              <Route
+                path='/ingredients/:id'
+                element={
+                  <Modal title='' onClose={handleModalClose}>
+                    <IngredientDetails />
+                  </Modal>
+                }
+              />
+              <Route
+                path='/profile/orders/:number'
+                element={
+                  <ProtectedRoute>
                     <Modal title='' onClose={handleModalClose}>
                       <OrderInfo />
                     </Modal>
-                  }
-                />
-                <Route
-                  path='/ingredients/:id'
-                  element={
-                    <Modal
-                      title='Детали ингредиента'
-                      onClose={handleModalClose}
-                    >
-                      <IngredientDetails />
-                    </Modal>
-                  }
-                />
-                <Route
-                  path='/profile/orders/:number'
-                  element={
-                    <ProtectedRoute>
-                      <Modal title='' onClose={handleModalClose}>
-                        <OrderInfo />
-                      </Modal>
-                    </ProtectedRoute>
-                  }
-                />
-              </Routes>
-            )}
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          )}
         </>
       )}
     </div>

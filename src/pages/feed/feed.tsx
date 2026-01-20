@@ -3,7 +3,6 @@ import { FeedUI } from '@ui-pages';
 import { FC, useEffect } from 'react';
 import { useDispatch, useSelector } from '../../services/store';
 import { getAllOrders } from '../../services/slices/orders-slice';
-import { fetchIngredients } from '../../services/slices/ingredients-slice';
 
 export const Feed: FC = () => {
   const dispatch = useDispatch();
@@ -13,13 +12,9 @@ export const Feed: FC = () => {
 
   useEffect(() => {
     dispatch(getAllOrders());
-    // Если ингредиенты не загружены, загружаем их
-    if (!ingredients.length) {
-      dispatch(fetchIngredients());
-    }
-  }, [dispatch, ingredients.length]);
+  }, [dispatch]);
 
-  if (isLoading || !orders.length) {
+  if (isLoading || !orders.length || !ingredients.length) {
     return <Preloader />;
   }
 

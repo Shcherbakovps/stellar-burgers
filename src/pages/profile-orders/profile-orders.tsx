@@ -2,7 +2,6 @@ import { ProfileOrdersUI } from '@ui-pages';
 import { FC, useEffect } from 'react';
 import { useDispatch, useSelector } from '../../services/store';
 import { getUserOrders } from '../../services/slices/orders-slice';
-import { fetchIngredients } from '../../services/slices/ingredients-slice';
 import { Preloader } from '@ui';
 
 export const ProfileOrders: FC = () => {
@@ -13,13 +12,9 @@ export const ProfileOrders: FC = () => {
 
   useEffect(() => {
     dispatch(getUserOrders());
-    // Если ингредиенты не загружены, загружаем их
-    if (!ingredients.length) {
-      dispatch(fetchIngredients());
-    }
-  }, [dispatch, ingredients.length]);
+  }, [dispatch]);
 
-  if (isLoading) {
+  if (isLoading || !ingredients.length) {
     return <Preloader />;
   }
 

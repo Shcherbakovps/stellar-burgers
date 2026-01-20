@@ -25,7 +25,6 @@ const initialState: AuthState = {
   error: null
 };
 
-// 🔐 логин
 export const loginUser = createAsyncThunk(
   'auth/login',
   async (data: TLoginData, { rejectWithValue }) => {
@@ -37,7 +36,6 @@ export const loginUser = createAsyncThunk(
   }
 );
 
-// 📝 регистрация
 export const registerUser = createAsyncThunk(
   'auth/register',
   async (data: TRegisterData, { rejectWithValue }) => {
@@ -49,7 +47,6 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-// 👤 получить пользователя
 export const getUser = createAsyncThunk(
   'auth/getUser',
   async (_, { rejectWithValue }) => {
@@ -61,7 +58,6 @@ export const getUser = createAsyncThunk(
   }
 );
 
-// 🚪 logout
 export const logoutUser = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
@@ -73,7 +69,6 @@ export const logoutUser = createAsyncThunk(
   }
 );
 
-// ✏️ обновить пользователя
 export const updateUser = createAsyncThunk(
   'auth/updateUser',
   async (data: Partial<TRegisterData>, { rejectWithValue }) => {
@@ -92,7 +87,6 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
 
-      // login
       .addCase(loginUser.pending, (state) => {
         state.request = true;
         state.error = null;
@@ -123,9 +117,18 @@ const authSlice = createSlice({
       })
 
       // logout
+      .addCase(logoutUser.pending, (state) => {
+        state.request = true;
+        state.error = null;
+      })
       .addCase(logoutUser.fulfilled, (state) => {
+        state.request = false;
         state.user = null;
         state.isAuthChecked = true;
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.request = false;
+        state.error = action.payload as string;
       })
 
       // updateUser
