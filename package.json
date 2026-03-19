@@ -91,7 +91,13 @@
     "build-storybook": "storybook build",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx ./src",
     "lint:fix": "npm run lint -- --fix",
-    "format": "prettier ./src --write"
+    "format": "prettier ./src --write",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "cy:open:chrome": "cypress open --browser chrome",
+    "cy:run:chrome": "cypress run --browser chrome"
   },
   "eslintConfig": {
     "extends": [
