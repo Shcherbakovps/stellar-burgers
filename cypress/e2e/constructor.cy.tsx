@@ -4,6 +4,18 @@ describe('Burger constructor page', () => {
   const accessToken = 'Bearer test-access-token';
   const refreshToken = 'test-refresh-token';
 
+  const TAB_BUN = 'Булки';
+  const TAB_FILLINGS = 'Начинки';
+  const BUN_NAME = 'Тестовая булка';
+  const FILLING_NAME = 'Тестовая начинка';
+  const INGREDIENT_DETAILS_TITLE = 'Детали ингредиента';
+  const ADD_BUTTON_TEXT = 'Добавить';
+  const MODAL_CLOSE_SELECTOR = '[data-cy="modal-close"]';
+  const MODAL_OVERLAY_SELECTOR = '[data-cy="modal-overlay"]';
+  const ORDER_NUMBER_TEXT = '12345';
+  const BUNS_EMPTY_TEXT = 'Выберите булки';
+  const FILLINGS_EMPTY_TEXT = 'Выберите начинку';
+
   const openTab = (tabName: string) => {
     cy.contains(tabName, { timeout: 10000 })
       .closest('.tab')
@@ -38,69 +50,69 @@ describe('Burger constructor page', () => {
   });
 
   it('adds bun and filling into constructor', () => {
-    openTab('Булки');
-    cy.contains('Тестовая булка')
+    openTab(TAB_BUN);
+    cy.contains(BUN_NAME)
       .closest('li')
       .within(() => {
-        cy.contains('Добавить').click();
+        cy.contains(ADD_BUTTON_TEXT).click();
       });
 
-    openTab('Начинки');
-    cy.contains('Тестовая начинка')
+    openTab(TAB_FILLINGS);
+    cy.contains(FILLING_NAME)
       .closest('li')
       .within(() => {
-        cy.contains('Добавить').click();
+        cy.contains(ADD_BUTTON_TEXT).click();
       });
 
     cy.contains('Тестовая булка (верх)').should('be.visible');
     cy.contains('Тестовая булка (низ)').should('be.visible');
-    cy.contains('Тестовая начинка').should('be.visible');
+    cy.contains(FILLING_NAME).should('be.visible');
   });
 
   it('opens ingredient modal and closes by close button and overlay', () => {
-    openTab('Начинки');
-    cy.contains('Тестовая начинка').click();
-    cy.contains('Детали ингредиента').should('be.visible');
-    cy.contains('Тестовая начинка').should('be.visible');
+    openTab(TAB_FILLINGS);
+    cy.contains(FILLING_NAME).click();
+    cy.contains(INGREDIENT_DETAILS_TITLE).should('be.visible');
+    cy.contains(FILLING_NAME).should('be.visible');
 
-    cy.get('[data-cy="modal-close"]').click();
-    cy.contains('Детали ингредиента').should('not.exist');
+    cy.get(MODAL_CLOSE_SELECTOR).click();
+    cy.contains(INGREDIENT_DETAILS_TITLE).should('not.exist');
 
-    cy.contains('Булки', { timeout: 10000 }).should('exist');
-    openTab('Булки');
-    cy.contains('Тестовая булка').click();
-    cy.contains('Детали ингредиента').should('be.visible');
-    cy.get('[data-cy="modal-overlay"]').click('topLeft', { force: true });
-    cy.contains('Детали ингредиента').should('not.exist');
+    cy.contains(TAB_BUN, { timeout: 10000 }).should('exist');
+    openTab(TAB_BUN);
+    cy.contains(BUN_NAME).click();
+    cy.contains(INGREDIENT_DETAILS_TITLE).should('be.visible');
+    cy.get(MODAL_OVERLAY_SELECTOR).click('topLeft', { force: true });
+    cy.contains(INGREDIENT_DETAILS_TITLE).should('not.exist');
   });
 
   it('creates order, shows correct number, closes modal and clears constructor', () => {
     visitWithAuth();
     cy.wait('@getIngredients');
 
-    openTab('Булки');
-    cy.contains('Тестовая булка')
+    openTab(TAB_BUN);
+    cy.contains(BUN_NAME)
       .closest('li')
       .within(() => {
-        cy.contains('Добавить').click();
+        cy.contains(ADD_BUTTON_TEXT).click();
       });
 
-    openTab('Начинки');
-    cy.contains('Тестовая начинка')
+    openTab(TAB_FILLINGS);
+    cy.contains(FILLING_NAME)
       .closest('li')
       .within(() => {
-        cy.contains('Добавить').click();
+        cy.contains(ADD_BUTTON_TEXT).click();
       });
 
     cy.contains('Оформить заказ').click();
     cy.wait('@createOrder');
 
-    cy.contains('12345').should('be.visible');
-    cy.get('[data-cy="modal-close"]').click();
-    cy.contains('12345').should('not.exist');
+    cy.contains(ORDER_NUMBER_TEXT).should('be.visible');
+    cy.get(MODAL_CLOSE_SELECTOR).click();
+    cy.contains(ORDER_NUMBER_TEXT).should('not.exist');
 
-    cy.contains('Выберите булки').should('be.visible');
-    cy.contains('Выберите начинку').should('be.visible');
+    cy.contains(BUNS_EMPTY_TEXT).should('be.visible');
+    cy.contains(FILLINGS_EMPTY_TEXT).should('be.visible');
 
     cy.clearCookie('accessToken');
     cy.clearLocalStorage('refreshToken');
